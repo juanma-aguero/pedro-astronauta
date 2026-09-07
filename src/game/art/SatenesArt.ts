@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { ASSET_KEYS } from "../config/assetKeys";
-import { GAME_WIDTH, GAME_HEIGHT } from "../config/gameConfig";
-import type { PlatformConfig } from "../planets/satenes/satenesConfig";
+import { GAME_WIDTH } from "../config/gameConfig";
+import type { PlatformConfig } from "../planets/planetTypes";
 
 /** Scenery is screen-sized; mirrored repeats meet seamlessly at either edge. */
 export class SatenesArt {
@@ -9,9 +9,9 @@ export class SatenesArt {
   private readonly planet: Phaser.GameObjects.Image;
 
   constructor(private readonly scene: Phaser.Scene) {
-    scene.add.image(0, -108, ASSET_KEYS.sky).setOrigin(0).setDisplaySize(1280, 853).setScrollFactor(0).setDepth(-100);
-    this.planet = scene.add.image(977, 164, ASSET_KEYS.props, "planet").setDisplaySize(250, 250).setScrollFactor(0).setDepth(-90);
-    scene.add.image(237, 201, ASSET_KEYS.props, "planet").setDisplaySize(60, 60).setTint(0x686caf).setAlpha(0.65).setScrollFactor(0).setDepth(-90);
+    scene.add.image(0, -108, ASSET_KEYS.satenesSky).setOrigin(0).setDisplaySize(1280, 853).setScrollFactor(0).setDepth(-100);
+    this.planet = scene.add.image(977, 164, ASSET_KEYS.satenesProps, "planet").setDisplaySize(250, 250).setScrollFactor(0).setDepth(-90);
+    scene.add.image(237, 201, ASSET_KEYS.satenesProps, "planet").setDisplaySize(60, 60).setTint(0x686caf).setAlpha(0.65).setScrollFactor(0).setDepth(-90);
     this.addRidges(1280, 690, 0.12, -80, 0.38, 0x8b8fbf);
     this.addRidges(1450, 775, 0.28, -70, 0.78, 0xffffff);
     for (let i = 0; i < 20; i++) {
@@ -23,7 +23,7 @@ export class SatenesArt {
   }
 
   private addRidges(width: number, bottom: number, factor: number, depth: number, alpha: number, tint: number): void {
-    const images = Array.from({ length: 3 }, () => this.scene.add.image(0, bottom, ASSET_KEYS.ridges).setOrigin(0, 1).setDisplaySize(width, width * 2 / 3).setScrollFactor(0).setDepth(depth).setAlpha(alpha).setTint(tint));
+    const images = Array.from({ length: 3 }, () => this.scene.add.image(0, bottom, ASSET_KEYS.satenesRidges).setOrigin(0, 1).setDisplaySize(width, width * 2 / 3).setScrollFactor(0).setDepth(depth).setAlpha(alpha).setTint(tint));
     this.layers.push({ images, width, factor });
   }
 
@@ -51,22 +51,15 @@ export function drawTerrain(scene: Phaser.Scene, cfg: PlatformConfig): void {
   const cap = 128 * scale;
   const left = cfg.x - cfg.width / 2;
   const top = cfg.y - cfg.height / 2 - 1;
-  scene.add.image(left, top, ASSET_KEYS.terrain, `${prefix}-left`).setOrigin(0).setDisplaySize(cap, height).setDepth(1);
-  scene.add.image(left + cfg.width - cap, top, ASSET_KEYS.terrain, `${prefix}-right`).setOrigin(0).setDisplaySize(cap, height).setDepth(1);
-  const fill = scene.add.tileSprite(left + cap, top, cfg.width - cap * 2, height, ASSET_KEYS.terrain, `${prefix}-middle`).setOrigin(0).setDepth(1);
+  scene.add.image(left, top, ASSET_KEYS.satenesTerrain, `${prefix}-left`).setOrigin(0).setDisplaySize(cap, height).setDepth(1);
+  scene.add.image(left + cfg.width - cap, top, ASSET_KEYS.satenesTerrain, `${prefix}-right`).setOrigin(0).setDisplaySize(cap, height).setDepth(1);
+  const fill = scene.add.tileSprite(left + cap, top, cfg.width - cap * 2, height, ASSET_KEYS.satenesTerrain, `${prefix}-middle`).setOrigin(0).setDepth(1);
   fill.setTileScale(scale, scale);
 }
 
 export function addPlant(scene: Phaser.Scene, x: number, y: number, height = 60): void {
-  const plant = scene.add.image(x, y, ASSET_KEYS.props, "plant").setOrigin(0.5, 1).setDisplaySize(height * 0.775, height).setDepth(-1);
+  const plant = scene.add.image(x, y, ASSET_KEYS.satenesProps, "plant").setOrigin(0.5, 1).setDisplaySize(height * 0.775, height).setDepth(-1);
   const light = scene.add.image(x, y - height * 0.6, ASSET_KEYS.particle).setTint(0xe268ff).setBlendMode(Phaser.BlendModes.ADD).setScale(height / 14).setAlpha(0.13).setDepth(-2);
   scene.tweens.add({ targets: light, alpha: 0.26, duration: 2200 + x % 800, yoyo: true, repeat: -1 });
   scene.tweens.add({ targets: plant, angle: 2, duration: 2400 + x % 700, yoyo: true, repeat: -1 });
-}
-
-export function menuBackdrop(scene: Phaser.Scene): SatenesArt {
-  const art = new SatenesArt(scene);
-  art.update(0);
-  scene.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x080d25, 0.38).setDepth(-10);
-  return art;
 }

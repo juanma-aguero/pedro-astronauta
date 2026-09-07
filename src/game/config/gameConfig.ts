@@ -1,9 +1,12 @@
 import Phaser from "phaser";
 import { BootScene } from "../scenes/BootScene";
 import { MenuScene } from "../scenes/MenuScene";
+import { WorldSelectScene } from "../scenes/WorldSelectScene";
 import { GameOverScene } from "../scenes/GameOverScene";
 import { LevelCompleteScene } from "../scenes/LevelCompleteScene";
 import { SatenesScene } from "../planets/satenes/SatenesScene";
+import { PinosScene } from "../planets/pinos/PinosScene";
+import { SilencioScene } from "../planets/silencio/SilencioScene";
 
 export const GAME_WIDTH = 1280;
 export const GAME_HEIGHT = 720;
@@ -28,7 +31,16 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  // Only BootScene and MenuScene run on initial load; the rest are started
-  // explicitly through the scene flow.
-  scene: [BootScene, MenuScene, SatenesScene, GameOverScene, LevelCompleteScene],
+  // Only BootScene runs on initial load (it starts MenuScene); the rest are
+  // started explicitly through the data-driven scene flow.
+  scene: [
+    BootScene,
+    MenuScene,
+    WorldSelectScene,
+    SatenesScene,
+    PinosScene,
+    SilencioScene,
+    GameOverScene,
+    LevelCompleteScene,
+  ],
 };

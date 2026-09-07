@@ -1,30 +1,14 @@
 import type { BlueMonsterConfig } from "../../entities/enemies/BlueMonster";
-
-export interface Position {
-  x: number;
-  y: number;
-}
-
-export interface PlatformConfig extends Position {
-  /** `x` and `y` are the center of the rectangle. */
-  width: number;
-  height: number;
-}
+import type { BasePlanetLevelConfig, PlatformConfig, Position } from "../planetTypes";
 
 export interface DecorationConfig extends Position {
   kind: "star" | "rock" | "crater";
   scale?: number;
 }
 
-export interface PlanetLevelConfig {
-  name: string;
-  world: { width: number; height: number; voidY: number };
-  playerSpawn: Position;
-  spaceship: Position;
-  platforms: readonly PlatformConfig[];
+export interface SatenesLevelConfig extends BasePlanetLevelConfig {
   decorations: readonly DecorationConfig[];
   enemies: readonly BlueMonsterConfig[];
-  clue: Position;
 }
 
 const GROUND_Y = 680;
@@ -105,8 +89,7 @@ function buildDecorations(): readonly DecorationConfig[] {
   return decorations;
 }
 
-export const satenesConfig: PlanetLevelConfig = {
-  name: "Satenes",
+export const satenesConfig: SatenesLevelConfig = {
   world: { width: 10000, height: 720, voidY: 820 },
   playerSpawn: { x: 220, y: 580 },
   spaceship: { x: 110, y: 560 },

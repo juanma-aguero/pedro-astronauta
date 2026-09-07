@@ -1,20 +1,78 @@
 import { ASSET_KEYS } from "./assetKeys";
 
-export const ART_SOURCES = [
-  { key: ASSET_KEYS.sky, file: "sky.png", matte: false },
-  { key: "source-pedro", file: "pedro.png", matte: true },
-  { key: "source-run", file: "pedro-run.png", matte: true },
-  { key: "source-hurt", file: "pedro-hurt.png", matte: true },
-  { key: "source-worm", file: "worm.png", matte: true },
-  { key: ASSET_KEYS.props, file: "props.png", matte: true },
-  { key: ASSET_KEYS.terrain, file: "terrain.png", matte: true },
-  { key: ASSET_KEYS.ridges, file: "ridges.png", matte: true },
-] as const;
+/**
+ * Illustrated source images. Each entry carries its own path relative to the
+ * public root, so the loader never has to know planet-specific path rules.
+ * `matte` marks images that ship with a green key colour to remove once.
+ */
+export interface ArtSource {
+  key: string;
+  path: string;
+  matte: boolean;
+}
+
+/** Shared Pedro artwork. Lives under assets/common and is never planet-owned. */
+export const SHARED_ART_SOURCES: readonly ArtSource[] = [
+  { key: "source-pedro", path: "assets/common/pedro.png", matte: true },
+  { key: "source-run", path: "assets/common/pedro-run.png", matte: true },
+  { key: "source-hurt", path: "assets/common/pedro-hurt.png", matte: true },
+];
+
+/** Satenes-owned artwork. */
+export const SATENES_ART_SOURCES: readonly ArtSource[] = [
+  { key: ASSET_KEYS.satenesSky, path: "assets/satenes/sky.png", matte: false },
+  { key: "source-worm", path: "assets/satenes/worm.png", matte: true },
+  { key: ASSET_KEYS.satenesProps, path: "assets/satenes/props.png", matte: true },
+  { key: ASSET_KEYS.satenesTerrain, path: "assets/satenes/terrain.png", matte: true },
+  { key: ASSET_KEYS.satenesRidges, path: "assets/satenes/ridges.png", matte: true },
+];
+
+/**
+ * Pinos-owned artwork. Pinos currently ships with procedural placeholder
+ * textures generated in `preparePinosArt`. To swap in final PNGs:
+ *   1. drop the files into `public/assets/pinos/`
+ *   2. add their entries here (key + path + matte)
+ *   3. delete the matching generator call in `preparePinosArt`
+ * Nothing in `PinosScene` or `HeavyMetalPlush` needs to change.
+ */
+export const PINOS_ART_SOURCES: readonly ArtSource[] = [
+  // { key: ASSET_KEYS.pinosSky, path: "assets/pinos/sky.png", matte: false },
+  // { key: ASSET_KEYS.pinosRidges, path: "assets/pinos/ridges.png", matte: true },
+  // { key: ASSET_KEYS.pinosTerrain, path: "assets/pinos/terrain.png", matte: true },
+  // { key: ASSET_KEYS.pinosProps, path: "assets/pinos/props.png", matte: true },
+  // { key: ASSET_KEYS.pinosPlushArt, path: "assets/pinos/heavy-metal-plush.png", matte: true },
+];
+
+/**
+ * Silencio-owned artwork. Like Pinos, Silencio currently ships with procedural
+ * placeholder textures generated in `prepareSilencioArt`. To swap in final PNGs:
+ *   1. drop the files into `public/assets/silencio/`
+ *   2. add their entries here (key + path + matte)
+ *   3. delete the matching generator call in `prepareSilencioArt`
+ * Nothing in `SilencioScene` or `Oscuro` needs to change.
+ */
+export const SILENCIO_ART_SOURCES: readonly ArtSource[] = [
+  // { key: ASSET_KEYS.silencioSky, path: "assets/silencio/sky.png", matte: false },
+  // { key: ASSET_KEYS.silencioRidges, path: "assets/silencio/ridges.png", matte: true },
+  // { key: ASSET_KEYS.silencioTerrain, path: "assets/silencio/terrain.png", matte: true },
+  // { key: ASSET_KEYS.silencioProps, path: "assets/silencio/props.png", matte: true },
+  // { key: ASSET_KEYS.silencioOscuroArt, path: "assets/silencio/oscuro.png", matte: true },
+];
+
+/** Every image the boot loader must fetch, regardless of owner. */
+export const ART_SOURCES: readonly ArtSource[] = [
+  ...SHARED_ART_SOURCES,
+  ...SATENES_ART_SOURCES,
+  ...PINOS_ART_SOURCES,
+  ...SILENCIO_ART_SOURCES,
+];
 
 /** World units: these are the original MVP collision dimensions. */
 export const BODY_SIZES = {
   player: { width: 42, height: 58 },
   monster: { width: 48, height: 42 },
+  plush: { width: 52, height: 48 },
+  oscuro: { width: 46, height: 52 },
   clue: { width: 48, height: 48 },
 } as const;
 

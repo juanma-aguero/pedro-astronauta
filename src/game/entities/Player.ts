@@ -8,6 +8,17 @@ const BLINK_FADED_ALPHA = 0.3;
 const BLINK_INTERVAL_MS = 100;
 
 /**
+ * Movement/traversal events Pedro emits on himself (he is a Phaser
+ * EventEmitter). Planets opt in by listening; Pedro never knows who listens or
+ * which world he is on. Discrete moments only — footstep cadence is left to the
+ * scene, which can derive it from `isGrounded()` and the body velocity.
+ */
+export const PLAYER_EVENTS = {
+  jump: "player:jump",
+  land: "player:land",
+} as const;
+
+/**
  * Pedro. Owns input-driven movement, jumping, health, damage gating, and
  * blinking. Holds no planet-specific knowledge.
  */
@@ -17,6 +28,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private health: number = PLAYER_TUNING.maxHealth;
   private invulnerableUntil = 0;
   private controlEnabled = true;
+
+  /**
+   * Generic horizontal-speed scale, default 1 (no effect). A scene can lower it
+   * for a careful/stealth walk or raise it for a sprint without Pedro knowing
+   * why. Jump strength is deliberately unaffected.
+   */
+  private speedMultiplier = 1;
 
   private readonly keys: {
     left: Phaser.Input.Keyboard.Key;
@@ -78,19 +96,36 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const leftHeld = this.keys.left.isDown || this.keys.a.isDown;
     const rightHeld = this.keys.right.isDown || this.keys.d.isDown;
 
+    const speed = PLAYER_TUNING.moveSpeed * this.speedMultiplier;
     if (leftHeld === rightHeld) {
       // Neither held, or both held: no horizontal movement.
       this.setVelocityX(0);
     } else if (leftHeld) {
-      this.setVelocityX(-PLAYER_TUNING.moveSpeed);
+      this.setVelocityX(-speed);
     } else {
-      this.setVelocityX(PLAYER_TUNING.moveSpeed);
+      this.setVelocityX(speed);
     }
 
     const onFloor = body.blocked.down || body.touching.down;
     if (Phaser.Input.Keyboard.JustDown(this.keys.space) && onFloor) {
       this.setVelocityY(PLAYER_TUNING.jumpVelocity);
+      this.emit(PLAYER_EVENTS.jump, this.x, body.bottom);
     }
+  }
+
+  /** Generic movement-speed scale (1 = default). Does not affect jumping. */
+  setSpeedMultiplier(multiplier: number): void {
+    this.speedMultiplier = Math.max(0, multiplier);
+  }
+
+  getSpeedMultiplier(): number {
+    return this.speedMultiplier;
+  }
+
+  /** True while the Arcade body rests on a surface. */
+  isGrounded(): boolean {
+    const body = this.body as Phaser.Physics.Arcade.Body | null;
+    return !!body && (body.blocked.down || body.touching.down);
   }
 
   /**
@@ -142,7 +177,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       : Math.abs(body.velocity.x) > 1 ? ANIMATIONS.run : ANIMATIONS.idle;
     this.art.play(animation, true);
     this.art.setScale(1, animation === ANIMATIONS.idle ? 1 + Math.sin(this.scene.time.now / 480) * 0.009 : 1);
-    if (onFloor && !this.wasGrounded) this.dust.explode(7, this.x, body.bottom);
+    if (onFloor && !this.wasGrounded) {
+      this.dust.explode(7, this.x, body.bottom);
+      this.emit(PLAYER_EVENTS.land, this.x, body.bottom);
+    }
     this.wasGrounded = onFloor;
   }
 

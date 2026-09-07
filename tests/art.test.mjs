@@ -76,7 +76,7 @@ function crop(image, x, y, width, height) {
 
 const images = new Map();
 for (const source of manifest.ART_SOURCES) {
-  const image = readPng(resolve(root, "public/assets/satenes", source.file));
+  const image = readPng(resolve(root, "public", source.path));
   if (source.matte) keyGreenMatte(image.data);
   images.set(source.key, image);
 }
@@ -92,14 +92,14 @@ test("green matte becomes transparent without erasing suit, skin, gold or worm c
 test("all production assets decode and matte backgrounds are transparent", () => {
   for (const source of manifest.ART_SOURCES) {
     const image = images.get(source.key);
-    assert.ok(image.width >= 1024 && image.height >= 1024, source.file);
+    assert.ok(image.width >= 1024 && image.height >= 1024, source.path);
     if (source.matte) {
-      assert.equal(image.data[3], 0, `${source.file}: corner matte`);
+      assert.equal(image.data[3], 0, `${source.path}: corner matte`);
       let remainingGreen = 0;
       for (let p = 0; p < image.data.length; p += 4) {
         if (image.data[p + 3] > 160 && image.data[p + 1] > Math.max(image.data[p], image.data[p + 2]) + 28) remainingGreen++;
       }
-      assert.equal(remainingGreen, 0, `${source.file}: no opaque green spill`);
+      assert.equal(remainingGreen, 0, `${source.path}: no opaque green spill`);
     }
   }
 });
@@ -128,7 +128,7 @@ test("worm poses fit the output canvas without clipping", () => {
 });
 
 test("prop and terrain atlas rectangles are in bounds and contain artwork", () => {
-  for (const [key, frames] of [[ASSET_KEYS.props, manifest.PROP_FRAMES], [ASSET_KEYS.terrain, manifest.TERRAIN_FRAMES]]) {
+  for (const [key, frames] of [[ASSET_KEYS.satenesProps, manifest.PROP_FRAMES], [ASSET_KEYS.satenesTerrain, manifest.TERRAIN_FRAMES]]) {
     const image = images.get(key);
     for (const f of frames) {
       assert.ok(f.x >= 0 && f.y >= 0 && f.x + f.width <= image.width && f.y + f.height <= image.height, f.name);
@@ -139,7 +139,7 @@ test("prop and terrain atlas rectangles are in bounds and contain artwork", () =
 });
 
 test("art pass preserves original collision sizes and gameplay tuning", () => {
-  assert.equal(JSON.stringify(manifest.BODY_SIZES), JSON.stringify({ player: { width: 42, height: 58 }, monster: { width: 48, height: 42 }, clue: { width: 48, height: 48 } }));
+  assert.equal(JSON.stringify(manifest.BODY_SIZES), JSON.stringify({ player: { width: 42, height: 58 }, monster: { width: 48, height: 42 }, plush: { width: 52, height: 48 }, oscuro: { width: 46, height: 52 }, clue: { width: 48, height: 48 } }));
   const { PLAYER_TUNING } = loadTs("src/game/config/gameplayTuning.ts");
   assert.equal(PLAYER_TUNING.moveSpeed, 260);
   assert.equal(PLAYER_TUNING.jumpVelocity, -650);

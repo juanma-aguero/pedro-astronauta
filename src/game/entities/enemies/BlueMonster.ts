@@ -56,7 +56,7 @@ export class BlueMonster extends Phaser.Physics.Arcade.Sprite {
     config: BlueMonsterConfig,
     getTarget: TargetPositionProvider,
   ) {
-    super(scene, config.x, config.y, ASSET_KEYS.blueMonster);
+    super(scene, config.x, config.y, ASSET_KEYS.satenesMonsterBody);
 
     this.config = config;
     this.getTarget = getTarget;
@@ -71,7 +71,7 @@ export class BlueMonster extends Phaser.Physics.Arcade.Sprite {
     this.setBounce(0);
     this.setVisible(false);
     (this.body as Phaser.Physics.Arcade.Body).setSize(BODY_SIZES.monster.width, BODY_SIZES.monster.height);
-    this.art = scene.add.sprite(config.x, config.y, ASSET_KEYS.monsterArt, 0)
+    this.art = scene.add.sprite(config.x, config.y, ASSET_KEYS.satenesMonsterArt, 0)
       .setOrigin(0.5, MONSTER_FRAMES.baseline / MONSTER_FRAMES.height).setDepth(8);
     this.art.play(ANIMATIONS.crawl);
     scene.events.on(Phaser.Scenes.Events.POST_UPDATE, this.syncArt, this);

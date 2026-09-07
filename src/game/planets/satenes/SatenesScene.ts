@@ -5,6 +5,14 @@ import { BlueMonster } from "../../entities/enemies/BlueMonster";
 import { satenesConfig } from "./satenesConfig";
 import { SatenesArt, addPlant, drawTerrain } from "../../art/SatenesArt";
 import { HealthHud } from "../../ui/HealthHud";
+import type { LevelRunContext } from "../levelNavigation";
+
+/** This phase's identity for the shared result screens. */
+const RUN_CONTEXT: LevelRunContext = {
+  worldId: "satenes",
+  levelId: "phase-1",
+  sceneKey: "SatenesScene",
+};
 
 export class SatenesScene extends Phaser.Scene {
   private player!: Player;
@@ -51,7 +59,7 @@ export class SatenesScene extends Phaser.Scene {
 
     // 4. Decorative art is independent of overlap and collision bodies.
     this.add
-      .image(satenesConfig.spaceship.x, 641, ASSET_KEYS.props, "rocket")
+      .image(satenesConfig.spaceship.x, 641, ASSET_KEYS.satenesProps, "rocket")
       .setOrigin(0.5, 1).setDisplaySize(180, 254).setDepth(-1);
 
     this.clueSprite = this.physics.add.staticImage(
@@ -60,7 +68,7 @@ export class SatenesScene extends Phaser.Scene {
       ASSET_KEYS.clue,
     );
     this.clueSprite.setVisible(false);
-    const clueArt = this.add.image(satenesConfig.clue.x, satenesConfig.clue.y, ASSET_KEYS.props, "clue").setDisplaySize(72, 66).setDepth(5);
+    const clueArt = this.add.image(satenesConfig.clue.x, satenesConfig.clue.y, ASSET_KEYS.satenesProps, "clue").setDisplaySize(72, 66).setDepth(5);
     this.tweens.add({ targets: clueArt, y: clueArt.y - 9, duration: 1500, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
     this.add.particles(satenesConfig.clue.x, satenesConfig.clue.y, ASSET_KEYS.particle, {
       lifespan: 900, frequency: 180, speedY: { min: -25, max: -10 },
@@ -149,7 +157,7 @@ export class SatenesScene extends Phaser.Scene {
 
       if (this.player.isDead()) {
         this.transitioning = true;
-        this.scene.start("GameOverScene");
+        this.scene.start("GameOverScene", RUN_CONTEXT);
       }
     };
 
@@ -159,7 +167,7 @@ export class SatenesScene extends Phaser.Scene {
         return;
       }
       this.transitioning = true;
-      this.scene.start("LevelCompleteScene");
+      this.scene.start("LevelCompleteScene", RUN_CONTEXT);
     };
 
   private refreshHud(): void {
@@ -170,7 +178,7 @@ export class SatenesScene extends Phaser.Scene {
     for (const deco of satenesConfig.decorations) {
       if (deco.kind === "star") continue;
       if (deco.kind === "rock") {
-        this.add.image(deco.x, 641, ASSET_KEYS.props, "rocks").setOrigin(0.5, 1)
+        this.add.image(deco.x, 641, ASSET_KEYS.satenesProps, "rocks").setOrigin(0.5, 1)
           .setDisplaySize(58, 31).setDepth(-2).setAlpha(0.9);
       } else {
         addPlant(this, deco.x + 70, 642, 42);
