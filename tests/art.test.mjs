@@ -128,7 +128,7 @@ test("worm poses fit the output canvas without clipping", () => {
 });
 
 test("prop and terrain atlas rectangles are in bounds and contain artwork", () => {
-  for (const [key, frames] of [[ASSET_KEYS.satenesProps, manifest.PROP_FRAMES], [ASSET_KEYS.satenesTerrain, manifest.TERRAIN_FRAMES]]) {
+  for (const [key, frames] of [[ASSET_KEYS.satenesProps, manifest.PROP_FRAMES], [ASSET_KEYS.satenesTerrain, manifest.TERRAIN_FRAMES], [ASSET_KEYS.pinosProps, manifest.PINOS_PROP_FRAMES], [ASSET_KEYS.silencioProps, manifest.SILENCIO_PROP_FRAMES], [ASSET_KEYS.silencioLanding, manifest.SILENCIO_LANDING_FRAMES]]) {
     const image = images.get(key);
     for (const f of frames) {
       assert.ok(f.x >= 0 && f.y >= 0 && f.x + f.width <= image.width && f.y + f.height <= image.height, f.name);
@@ -152,5 +152,48 @@ test("art pass preserves original collision sizes and gameplay tuning", () => {
   for (const p of satenesConfig.platforms) {
     const scale = (p.height >= 60 ? p.height + 4 : p.height + 8) / (p.height >= 60 ? 238 : 164);
     assert.ok(p.width > 256 * scale, "terrain caps leave positive interior width");
+  }
+});
+
+
+test("Pinos props have transparent margins and intact silhouettes", () => {
+  const image = images.get(ASSET_KEYS.pinosProps);
+  for (const f of manifest.PINOS_PROP_FRAMES) {
+    const pixels = crop(image, f.x, f.y, f.width, f.height);
+    const b = opaqueBounds(pixels, f.width, f.height);
+    assert.ok(b.x > 0 && b.y > 0 && b.x + b.w < f.width && b.y + b.h < f.height,
+      `${f.name} must not be clipped by its source region`);
+    for (let x = 0; x < f.width; x++) {
+      assert.equal(pixels[x * 4 + 3], 0, `${f.name}: clear top edge`);
+      assert.equal(pixels[((f.height - 1) * f.width + x) * 4 + 3], 0, `${f.name}: clear bottom edge`);
+    }
+  }
+});
+
+
+test("Silencio sprites have clear crop margins and a solid walkable ground top", () => {
+  for (const [key, frames] of [
+    [ASSET_KEYS.silencioProps, manifest.SILENCIO_PROP_FRAMES],
+    [ASSET_KEYS.silencioLanding, manifest.SILENCIO_LANDING_FRAMES],
+  ]) {
+    const image = images.get(key);
+    for (const f of frames) {
+      const pixels = crop(image, f.x, f.y, f.width, f.height);
+      const b = opaqueBounds(pixels, f.width, f.height);
+      assert.ok(b.x > 0 && b.y > 0 && b.x + b.w < f.width && b.y + b.h < f.height,
+        `${f.name}: silhouette fits its crop`);
+      for (let x = 0; x < f.width; x++) {
+        assert.equal(pixels[x * 4 + 3], 0, `${f.name}: clear top margin`);
+        assert.equal(pixels[((f.height - 1) * f.width + x) * 4 + 3], 0, `${f.name}: clear bottom margin`);
+      }
+    }
+  }
+  const image = images.get(ASSET_KEYS.silencioProps);
+  const f = manifest.SILENCIO_GROUND_SURFACE;
+  for (let x = f.x; x < f.x + f.width; x++) {
+    // Each column must begin within six pixels of the configured walking line.
+    let covered = false;
+    for (let y = f.y; y < f.y + 6; y++) covered ||= image.data[(y * image.width + x) * 4 + 3] > 160;
+    assert.ok(covered, `ground surface at column ${x} must be visible`);
   }
 });

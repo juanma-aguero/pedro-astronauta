@@ -70,20 +70,16 @@ export class NoiseTrap extends Phaser.Physics.Arcade.Image {
   }
 
   private buildVisual(scene: Phaser.Scene, config: NoiseTrapConfig): Phaser.GameObjects.Container {
-    const g = scene.add.graphics();
-    const hw = config.width / 2;
-    const hh = config.height / 2;
-    // A leaning scrap plate with a couple of loose bars.
-    g.fillStyle(0x1c2434, 1).fillRoundedRect(-hw, -hh, config.width, config.height, 4);
-    g.lineStyle(2, 0x3a4a66, 1).strokeRoundedRect(-hw, -hh, config.width, config.height, 4);
-    g.lineStyle(3, 0x2a3346, 1);
-    g.lineBetween(-hw + 6, hh - 4, hw - 10, -hh + 6);
-    g.lineBetween(-hw + 14, hh - 4, hw - 2, hh - 10);
-    // Warning glint so it is visually distinguishable from safe terrain.
-    g.fillStyle(0xffb43c, 0.9).fillCircle(hw - 8, -hh + 8, 3);
-
-    const container = scene.add.container(config.x, config.y, [g]).setDepth(3);
-    scene.tweens.add({ targets: g, alpha: 0.6, duration: 900, yoyo: true, repeat: -1 });
+    const frame = scene.textures.get(ASSET_KEYS.silencioProps).get("noise-trap");
+    const height = config.height;
+    const device = scene.add.image(0, 0, ASSET_KEYS.silencioProps, "noise-trap")
+      .setDisplaySize(height * frame.width / frame.height, height);
+    // Retain a visible amber warning across the entire existing trigger area.
+    const glow = scene.add.image(0, 0, ASSET_KEYS.particle)
+      .setTint(0xffb43c).setBlendMode(Phaser.BlendModes.ADD)
+      .setDisplaySize(config.width, config.height * 1.4).setAlpha(0.15);
+    const container = scene.add.container(config.x, config.y, [glow, device]).setDepth(3);
+    scene.tweens.add({ targets: glow, alpha: 0.35, duration: 900, yoyo: true, repeat: -1 });
     return container;
   }
 

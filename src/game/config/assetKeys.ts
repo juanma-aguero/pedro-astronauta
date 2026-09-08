@@ -29,11 +29,16 @@ export const ASSET_KEYS = {
   pinosTerrain: "pinos-terrain",
   pinosSky: "pinos-sky",
   pinosRidges: "pinos-ridges",
+  pinosHazard: "pinos-hazard",
+  pinosBear: "pinos-bear",
+  pinosCrane: "pinos-crane",
+  pinosBanner: "pinos-banner",
 
   // Silencio.
   silencioOscuroBody: "silencio-oscuro-body",
   silencioOscuroArt: "silencio-oscuro-art",
   silencioProps: "silencio-props",
+  silencioLanding: "silencio-landing",
   silencioTerrain: "silencio-terrain",
   silencioSky: "silencio-sky",
   silencioRidges: "silencio-ridges",

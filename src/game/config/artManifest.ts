@@ -27,37 +27,42 @@ export const SATENES_ART_SOURCES: readonly ArtSource[] = [
   { key: ASSET_KEYS.satenesRidges, path: "assets/satenes/ridges.png", matte: true },
 ];
 
-/**
- * Pinos-owned artwork. Pinos currently ships with procedural placeholder
- * textures generated in `preparePinosArt`. To swap in final PNGs:
- *   1. drop the files into `public/assets/pinos/`
- *   2. add their entries here (key + path + matte)
- *   3. delete the matching generator call in `preparePinosArt`
- * Nothing in `PinosScene` or `HeavyMetalPlush` needs to change.
- */
+/** Painted Pinos scenery and a keyed prop sheet; decoded once during boot. */
 export const PINOS_ART_SOURCES: readonly ArtSource[] = [
-  // { key: ASSET_KEYS.pinosSky, path: "assets/pinos/sky.png", matte: false },
-  // { key: ASSET_KEYS.pinosRidges, path: "assets/pinos/ridges.png", matte: true },
-  // { key: ASSET_KEYS.pinosTerrain, path: "assets/pinos/terrain.png", matte: true },
-  // { key: ASSET_KEYS.pinosProps, path: "assets/pinos/props.png", matte: true },
-  // { key: ASSET_KEYS.pinosPlushArt, path: "assets/pinos/heavy-metal-plush.png", matte: true },
+  { key: ASSET_KEYS.pinosSky, path: "assets/pinos/scrapyard.png", matte: false },
+  { key: ASSET_KEYS.pinosProps, path: "assets/pinos/props.png", matte: true },
 ];
 
-/**
- * Silencio-owned artwork. Like Pinos, Silencio currently ships with procedural
- * placeholder textures generated in `prepareSilencioArt`. To swap in final PNGs:
- *   1. drop the files into `public/assets/silencio/`
- *   2. add their entries here (key + path + matte)
- *   3. delete the matching generator call in `prepareSilencioArt`
- * Nothing in `SilencioScene` or `Oscuro` needs to change.
- */
+/** Measured source regions, including a little safety margin around each prop. */
+export const PINOS_PROP_FRAMES = [
+  { name: "plush", x: 150, y: 104, width: 510, height: 405 },
+  { name: "rocket", x: 936, y: 65, width: 350, height: 500 },
+  { name: "ledge", x: 60, y: 706, width: 670, height: 142 },
+  { name: "ground", x: 776, y: 640, width: 697, height: 289 },
+] as const;
+
+/** Moonlit Silencio artwork. Green source mattes are decoded once at boot. */
 export const SILENCIO_ART_SOURCES: readonly ArtSource[] = [
-  // { key: ASSET_KEYS.silencioSky, path: "assets/silencio/sky.png", matte: false },
-  // { key: ASSET_KEYS.silencioRidges, path: "assets/silencio/ridges.png", matte: true },
-  // { key: ASSET_KEYS.silencioTerrain, path: "assets/silencio/terrain.png", matte: true },
-  // { key: ASSET_KEYS.silencioProps, path: "assets/silencio/props.png", matte: true },
-  // { key: ASSET_KEYS.silencioOscuroArt, path: "assets/silencio/oscuro.png", matte: true },
+  { key: ASSET_KEYS.silencioSky, path: "assets/silencio/caverns.png", matte: false },
+  { key: ASSET_KEYS.silencioProps, path: "assets/silencio/props.png", matte: true },
+  { key: ASSET_KEYS.silencioLanding, path: "assets/silencio/landing.png", matte: true },
 ];
+
+export const SILENCIO_PROP_FRAMES = [
+  { name: "oscuro", x: 130, y: 80, width: 565, height: 380 },
+  { name: "noise-trap", x: 935, y: 200, width: 295, height: 260 },
+  { name: "ledge", x: 100, y: 635, width: 615, height: 200 },
+  { name: "ground", x: 790, y: 525, width: 635, height: 400 },
+] as const;
+
+export const SILENCIO_LANDING_FRAMES = [
+  { name: "rocket", x: 105, y: 55, width: 605, height: 910 },
+  { name: "plant", x: 945, y: 45, width: 400, height: 400 },
+  { name: "spire", x: 920, y: 470, width: 480, height: 515 },
+] as const;
+
+/** Level rock top, below the decorative plants in the ground source region. */
+export const SILENCIO_GROUND_SURFACE = { x: 820, y: 622, width: 565, height: 290 } as const;
 
 /** Every image the boot loader must fetch, regardless of owner. */
 export const ART_SOURCES: readonly ArtSource[] = [

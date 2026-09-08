@@ -1,7 +1,7 @@
 import type Phaser from "phaser";
 import {
   ANIMATIONS, BODY_SIZES, MONSTER_FRAMES, PEDRO_POSES, PLAYER_FRAMES,
-  PROP_FRAMES, SATENES_ART_SOURCES, SHARED_ART_SOURCES, TERRAIN_FRAMES, WORM_POSES,
+  PINOS_ART_SOURCES, SILENCIO_ART_SOURCES, PROP_FRAMES, SATENES_ART_SOURCES, SHARED_ART_SOURCES, TERRAIN_FRAMES, WORM_POSES,
 } from "../config/artManifest";
 import { ASSET_KEYS } from "../config/assetKeys";
 import { keyGreenMatte, opaqueBounds } from "./artPixels";
@@ -134,7 +134,9 @@ export function preparePhysicsTextures(scene: Phaser.Scene): void {
 export function prepareArt(scene: Phaser.Scene): void {
   preparePlayerArt(scene);
   prepareSatenesArt(scene);
+  for (const source of PINOS_ART_SOURCES) if (source.matte) removeMatte(scene, source.key);
   preparePinosArt(scene);
+  for (const source of SILENCIO_ART_SOURCES) if (source.matte) removeMatte(scene, source.key);
   prepareSilencioArt(scene);
   preparePhysicsTextures(scene);
 }
